@@ -1,73 +1,55 @@
-# React + TypeScript + Vite
+# Linear Clone Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A high-fidelity clone of the Linear application frontend, built with modern web technologies. This project demonstrates a professional-grade UI implementation with a focus on polished interactions, responsive design, and maintainable code architecture.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Framework**: [React](https://react.dev/) + [Vite](https://vitejs.dev/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **UI Components**: [Shadcn/ui](https://ui.shadcn.com/) based (incorporating Radix UI primitives)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **State Management**: React Context (Sidebar)
 
-## React Compiler
+## Key Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Responsive Sidebar**: A fully collapsible and mobile-responsive sidebar akin to Linear's refined navigation.
+  - **Custom Trigger**: Optimized trigger placement (bottom on desktop, top-left on mobile).
+  - **Mobile Interactions**: Smooth drawer/sheet integration for smaller screens.
+- **Team Switching**: Integrated team switcher component with dropdown functionality.
+- **Polished UI**:
+  - Dark mode by default.
+  - Subtle hover states and transitions.
+  - Clean typography and spacing.
+- **Code Quality**:
+  - "Complexity 1" focus for clean, declarative code.
+  - Strictly typed components.
+  - Organized component structure (`components/ui` for primitives, `components` for compositions).
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
+2.  **Run development server**:
+    ```bash
+    npm run dev
+    ```
+3.  **Build for production**:
+    ```bash
+    npm run build
+    ```
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Project Structure
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- `src/components/ui`: Reusable UI primitives (Buttons, Sheet, Dropdown, etc.)
+- `src/components`: Feature-specific components (AppSidebar, TeamSwitcher, NavMain)
+- `src/hooks`: Custom hooks (e.g., `use-mobile`)
+- `src/App.tsx`: Main layout composer
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Recent Updates
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- Enhanced mobile sidebar experience.
+- Refactored sidebar header alignment.
+- Resolved dependency issues for robust builds.
