@@ -24,7 +24,24 @@ Branch naming convention:
 git checkout -b feature/celery-email-worker
 ```
 
-## Step 3: Stage Only Professional Files
+## Step 3: Run Quality Checks
+
+Before staging files, ensure code is formatted and error-free:
+
+// turbo
+
+```bash
+# Format code
+npm run format
+
+# Check for linting errors
+npm run lint
+```
+
+> [!IMPORTANT]
+> If `npm run lint` fails, fix the errors before proceeding. **Do not push code with linting errors.**
+
+## Step 4: Stage Only Professional Files
 
 **Include:**
 

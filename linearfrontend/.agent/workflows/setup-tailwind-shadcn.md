@@ -32,19 +32,19 @@ npm install tailwindcss @tailwindcss/vite
 `vite.config.ts` file mein Tailwind plugin add karo:
 
 ```typescript
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
-import path from "path";
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+import path from 'path'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': path.resolve(__dirname, './src'),
     },
   },
-});
+})
 ```
 
 **Changes:**
@@ -59,7 +59,7 @@ export default defineConfig({
 `src/index.css` file ko replace karo with:
 
 ```css
-@import "tailwindcss";
+@import 'tailwindcss';
 ```
 
 **Note:** Yeh Tailwind v4 ka naya CSS-first approach hai. Config file ki zarurat nahi!
@@ -128,15 +128,13 @@ npx shadcn@latest add button
 Update `src/App.tsx` with test UI:
 
 ```tsx
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'
 
 function App() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-900 to-slate-800">
       <div className="text-center space-y-8 p-8">
-        <h1 className="text-5xl font-bold text-white">
-          Tailwind CSS v4 + shadcn/ui
-        </h1>
+        <h1 className="text-5xl font-bold text-white">Tailwind CSS v4 + shadcn/ui</h1>
         <p className="text-xl text-slate-300">✅ Setup successful! 🎉</p>
 
         <div className="flex gap-4 justify-center">
@@ -148,10 +146,10 @@ function App() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
 ```
 
 ---
