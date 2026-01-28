@@ -1,3 +1,6 @@
+/**
+ * User model representing authenticated user data
+ */
 export interface User {
   id: number
   name: string

@@ -4,7 +4,6 @@ import Auth from '@/components/auth'
 import Dashboard from '@/components/dashboard'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { useAuth } from '@/hooks/use-auth'
-import './App.css'
 
 function App() {
   return (
