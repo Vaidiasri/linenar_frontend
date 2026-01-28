@@ -1,5 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 
+/**
+ * Authentication hook for checking auth status and handling logout
+ * Complexity: 1 (simple token check and removal)
+ */
 export const useAuth = () => {
   const navigate = useNavigate()
 
