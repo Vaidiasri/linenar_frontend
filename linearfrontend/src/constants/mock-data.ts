@@ -1,32 +1,11 @@
-import { Calendar, Home, Inbox, Search, Settings } from 'lucide-react'
+import { Folder } from 'lucide-react'
 
 
 export const MOCK_NAV_ITEMS = [
   {
-    title: 'Inbox',
-    url: '#',
-    icon: Inbox,
-    isActive: true,
-  },
-  {
-    title: 'My Issues',
-    url: '#',
-    icon: Home,
-  },
-  {
-    title: 'Views',
-    url: '#',
-    icon: Calendar,
-  },
-  {
-    title: 'Search',
-    url: '#',
-    icon: Search,
-  },
-  {
-    title: 'Settings',
-    url: '#',
-    icon: Settings,
+    title: 'Projects',
+    url: '/projects',
+    icon: Folder,
   },
 ]
 
