@@ -19,8 +19,8 @@ export function PageLayout({ title, children, action }: PageLayoutProps) {
           {action}
         </div>
       </header>
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <div className="min-h-screen flex-1 rounded-xl md:min-h-min p-6">{children}</div>
+      <div className="flex flex-1 flex-col gap-4 p-4 pt-0 overflow-y-auto">
+        <div className="min-h-min flex-1 rounded-xl p-6">{children}</div>
       </div>
     </>
   )

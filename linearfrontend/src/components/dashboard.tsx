@@ -17,7 +17,7 @@ export default function Dashboard() {
           <span className="text-sm font-medium text-muted-foreground">My Issues</span>
         </div>
       </header>
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-4">
+      <div className="flex flex-1 flex-col gap-4 p-4 pt-4 overflow-y-auto">
         <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
           <div className="p-6 space-y-6">
             <div className="flex items-center justify-between">
