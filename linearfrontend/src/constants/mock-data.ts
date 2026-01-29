@@ -1,6 +1,5 @@
 import { Folder } from 'lucide-react'
 
-
 export const MOCK_NAV_ITEMS = [
   {
     title: 'Projects',
