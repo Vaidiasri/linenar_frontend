@@ -1,11 +1,12 @@
+import React from 'react'
 import { Menu as MenuIcon } from 'lucide-react'
-import { SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 import { IssueItem } from '@/components/issue-item'
 import { MOCK_ISSUES } from '@/constants/mock-data'
 
 export default function Dashboard() {
   return (
-    <SidebarInset>
+    <>
       <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
         <div className="flex items-center gap-2 px-4 md:hidden">
           <SidebarTrigger>
@@ -16,7 +17,7 @@ export default function Dashboard() {
           <span className="text-sm font-medium text-muted-foreground">My Issues</span>
         </div>
       </header>
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+      <div className="flex flex-1 flex-col gap-4 p-4 pt-4">
         <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
           <div className="p-6 space-y-6">
             <div className="flex items-center justify-between">
@@ -26,9 +27,8 @@ export default function Dashboard() {
 
             <div className="space-y-4">
               {MOCK_ISSUES.map((issue, index) => (
-                <>
+                <React.Fragment key={issue.id}>
                   <IssueItem
-                    key={issue.id}
                     id={issue.id}
                     title={issue.title}
                     status={issue.status}
@@ -36,12 +36,12 @@ export default function Dashboard() {
                     assignee={issue.assignee}
                   />
                   {index < MOCK_ISSUES.length - 1 && <div className="h-px bg-border/50" />}
-                </>
+                </React.Fragment>
               ))}
             </div>
           </div>
         </div>
       </div>
-    </SidebarInset>
+    </>
   )
 }

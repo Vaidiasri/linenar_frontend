@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { CreateProjectData, createProject } from '../api/project'
+import { createProject } from '../api/project'
 import { useTeams } from '../hooks/use-teams'
 import { Button } from './ui/button'
 import { Input } from './ui/input'

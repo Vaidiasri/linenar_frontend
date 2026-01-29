@@ -24,9 +24,11 @@ function AppContent() {
       <Route
         element={
           isAuthenticated ? (
-            <SidebarProvider className="h-svh overflow-hidden">
-              <AppSidebar variant="inset" />
-              <Outlet />
+            <SidebarProvider>
+              <AppSidebar />
+              <SidebarInset>
+                <Outlet />
+              </SidebarInset>
             </SidebarProvider>
           ) : (
             <Navigate to="/login" replace />
