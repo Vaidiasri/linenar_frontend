@@ -1,8 +1,10 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, Outlet } from 'react-router-dom'
 import { AppSidebar } from '@/components/app-sidebar'
 import Auth from '@/components/auth'
 import Dashboard from '@/components/dashboard'
-import { SidebarProvider } from '@/components/ui/sidebar'
+import Projects from '@/pages/Projects'
+import ProjectDetail from '@/pages/ProjectDetail'
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { useAuth } from '@/hooks/use-auth'
 
 function App() {
@@ -20,18 +22,23 @@ function AppContent() {
     <Routes>
       <Route path="/login" element={<Auth />} />
       <Route
-        path="/"
         element={
           isAuthenticated ? (
             <SidebarProvider>
               <AppSidebar />
-              <Dashboard />
+              <SidebarInset>
+                <Outlet />
+              </SidebarInset>
             </SidebarProvider>
           ) : (
             <Navigate to="/login" replace />
           )
         }
-      />
+      >
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/projects" element={<Projects />} />
+        <Route path="/projects/:projectId" element={<ProjectDetail />} />
+      </Route>
     </Routes>
   )
 }
