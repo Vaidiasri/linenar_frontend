@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createProject } from '../api/project'
-import { useTeams } from '../hooks/use-teams'
-import { Button } from './ui/button'
-import { Input } from './ui/input'
-import { Label } from './ui/label'
+import { createProject } from '@/api/project'
+import { useTeams } from '@/hooks/use-teams'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Sheet,
   SheetContent,
@@ -14,8 +14,15 @@ import {
   SheetTrigger,
   SheetFooter,
   SheetClose,
-} from './ui/sheet'
+} from '@/components/ui/sheet'
 import { Plus } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 export function CreateProjectSheet() {
   const [open, setOpen] = useState(false)
@@ -55,13 +62,13 @@ export function CreateProjectSheet() {
           New Project
         </Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent className="sm:max-w-[425px]">
         <SheetHeader>
           <SheetTitle>Create Project</SheetTitle>
           <SheetDescription>Create a new project and assign it to a team.</SheetDescription>
         </SheetHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="space-y-2">
+        <form onSubmit={handleSubmit} className="space-y-6 pt-6">
+          <div className="space-y-2 w-[90%] mx-auto">
             <Label htmlFor="name">Name</Label>
             <Input
               id="name"
@@ -71,7 +78,7 @@ export function CreateProjectSheet() {
               required
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 w-[90%] mx-auto">
             <Label htmlFor="description">Description</Label>
             <Input
               id="description"
@@ -80,26 +87,22 @@ export function CreateProjectSheet() {
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 w-[90%] mx-auto">
             <Label htmlFor="team">Team</Label>
-            <select
-              id="team"
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-              value={teamId}
-              onChange={(e) => setTeamId(e.target.value)}
-              required
-            >
-              <option value="" disabled>
-                Select a team
-              </option>
-              {teams?.map((team) => (
-                <option key={team.id} value={team.id}>
-                  {team.name}
-                </option>
-              ))}
-            </select>
+            <Select value={teamId} onValueChange={setTeamId} required>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a team" />
+              </SelectTrigger>
+              <SelectContent>
+                {teams?.map((team) => (
+                  <SelectItem key={team.id} value={team.id}>
+                    {team.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <SheetFooter>
+          <SheetFooter className="gap-2 sm:space-x-0">
             <SheetClose asChild>
               <Button variant="outline" type="button">
                 Cancel

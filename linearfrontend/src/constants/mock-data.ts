@@ -1,6 +1,11 @@
-import { Folder } from 'lucide-react'
+import { Home, Folder } from 'lucide-react'
 
 export const MOCK_NAV_ITEMS = [
+  {
+    title: 'Home',
+    url: '/',
+    icon: Home,
+  },
   {
     title: 'Projects',
     url: '/projects',
