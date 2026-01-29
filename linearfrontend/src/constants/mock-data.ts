@@ -1,12 +1,5 @@
 import { Calendar, Home, Inbox, Search, Settings } from 'lucide-react'
 
-export const MOCK_TEAMS = [
-  {
-    name: 'Linear Clone',
-    logo: 'https://github.com/shadcn.png',
-    plan: 'Enterprise',
-  },
-]
 
 export const MOCK_NAV_ITEMS = [
   {

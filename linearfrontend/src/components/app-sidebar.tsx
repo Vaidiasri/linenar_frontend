@@ -12,10 +12,12 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 import { useLinearViewer } from '@/hooks/use-linear-viewer'
-import { MOCK_TEAMS, MOCK_NAV_ITEMS } from '@/constants/mock-data'
+import { useTeams } from '@/hooks/use-teams'
+import { MOCK_NAV_ITEMS } from '@/constants/mock-data'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: viewer } = useLinearViewer()
+  const { data: teams } = useTeams()
 
   const userData = React.useMemo(() => {
     if (!viewer) return { name: 'User', email: 'user@example.com', avatar: '' }
@@ -26,10 +28,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
   }, [viewer])
 
+  const formattedTeams = React.useMemo(() => {
+    if (!teams) return []
+    return teams.map((team) => ({
+      name: team.name,
+      logo: 'https://github.com/shadcn.png', // Placeholder logo
+      plan: team.key, // Using key as plan for now
+    }))
+  }, [teams])
+
   return (
     <Sidebar collapsible="icon" className="dark border-r-0" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={MOCK_TEAMS} />
+        {formattedTeams.length > 0 && <TeamSwitcher teams={formattedTeams} />}
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={MOCK_NAV_ITEMS} />
