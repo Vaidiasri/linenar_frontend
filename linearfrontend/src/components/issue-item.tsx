@@ -38,7 +38,9 @@ export function IssueItem({ id, title, status, priority, assignee }: IssueItemPr
   return (
     <div className="flex items-center gap-4 group cursor-pointer">
       <div className="flex items-center gap-2 min-w-[80px]">
-        <span className="text-xs text-muted-foreground font-mono">{id}</span>
+        <span className="text-xs text-muted-foreground font-mono">
+          #{id.slice(0, 5).toUpperCase()}
+        </span>
       </div>
       <div
         className={`size-4 rounded-full border-2 ${config.borderColor} ${config.bgColor} flex items-center justify-center`}

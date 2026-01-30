@@ -2,12 +2,12 @@
  * User model representing authenticated user data
  */
 export interface User {
-  id: number
-  name: string
+  id: string
+  full_name: string
   email: string
   avatar_url?: string
   role: string
-  team_id?: number
+  team_id?: string
 }
 
 export interface LoginResponse {
