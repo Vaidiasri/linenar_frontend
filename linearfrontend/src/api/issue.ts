@@ -36,3 +36,8 @@ export const createIssue = async (data: CreateIssueData) => {
   const response = await apiClient.post<Issue>('/issues/', data)
   return response.data
 }
+
+export const updateIssue = async (id: string, data: Partial<CreateIssueData>) => {
+  const response = await apiClient.put<Issue>(`/issues/${id}`, data)
+  return response.data
+}
