@@ -1,11 +1,11 @@
-import { useState } from 'react'
-import { MoreHorizontal, Trash, UserPlus } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { MoreHorizontal, Trash, UserPlus, Search } from 'lucide-react'
 
 import { useUsers, useDeleteUser } from '@/hooks/use-users'
 import { PageLayout } from '@/components/page-layout'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
 import { InviteUserSheet } from '@/components/InviteUserSheet'
 import { AssignIssueDialog } from '@/components/assign-issue-dialog'
 import {
@@ -35,6 +35,7 @@ export default function Members() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState<User | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
 
   if (isLoading) return <div className="p-8">Loading members...</div>
   if (error) return <div className="p-8 text-red-500">Error loading members</div>
@@ -46,6 +47,16 @@ export default function Members() {
     }
   }
 
+  const filteredUsers = useMemo(() => {
+    if (!users) return []
+    const lowerQuery = searchQuery.toLowerCase()
+    return users.filter(
+      (user) =>
+        user.full_name?.toLowerCase().includes(lowerQuery) ||
+        user.email?.toLowerCase().includes(lowerQuery)
+    )
+  }, [users, searchQuery])
+
   return (
     <PageLayout title="Members" action={<InviteUserSheet />}>
       <div className="flex items-center justify-between">
@@ -56,62 +67,77 @@ export default function Members() {
       </div>
 
       <Card className="mt-6">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle>All Members</CardTitle>
+          <div className="relative w-64">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search members..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-8"
+            />
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {users?.map((user) => (
-              <div
-                key={user.id}
-                className="flex items-center justify-between p-2 hover:bg-muted/50 rounded-lg group"
-              >
-                <div className="flex items-center gap-3">
-                  <Avatar>
-                    <AvatarImage src={user.avatar_url} />
-                    <AvatarFallback>{user.full_name?.charAt(0).toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="font-medium">{user.full_name}</div>
-                    <div className="text-sm text-muted-foreground">{user.email}</div>
+            {filteredUsers.length === 0 ? (
+              <div className="text-center text-sm text-muted-foreground py-8">
+                No members found matching "{searchQuery}"
+              </div>
+            ) : (
+              filteredUsers.map((user) => (
+                <div
+                  key={user.id}
+                  className="flex items-center justify-between p-2 hover:bg-muted/50 rounded-lg group"
+                >
+                  <div className="flex items-center gap-3">
+                    <Avatar>
+                      <AvatarImage src={user.avatar_url} />
+                      <AvatarFallback>{user.full_name?.charAt(0).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="font-medium">{user.full_name}</div>
+                      <div className="text-sm text-muted-foreground">{user.email}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">Open menu</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedUser(user)
+                            setIsAssignDialogOpen(true)
+                          }}
+                        >
+                          <UserPlus className="mr-2 h-4 w-4" />
+                          Assign to Issue
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="text-red-600"
+                          onClick={() => setUserToDelete(user)}
+                        >
+                          <Trash className="mr-2 h-4 w-4" />
+                          Delete User
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Open menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectedUser(user)
-                          setIsAssignDialogOpen(true)
-                        }}
-                      >
-                        <UserPlus className="mr-2 h-4 w-4" />
-                        Assign to Issue
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className="text-red-600"
-                        onClick={() => setUserToDelete(user)}
-                      >
-                        <Trash className="mr-2 h-4 w-4" />
-                        Delete User
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
