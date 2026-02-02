@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { NavMain } from '@/components/nav-main'
+import { NavMain, NavItem } from '@/components/nav-main'
 import { NavUser } from '@/components/nav-user'
 import { TeamSwitcher } from '@/components/team-switcher'
 import {
@@ -14,18 +14,19 @@ import {
 import { useLinearViewer } from '@/hooks/use-linear-viewer'
 import { useTeams } from '@/hooks/use-teams'
 import { useProjects } from '@/hooks/use-projects'
+import { useUsers } from '@/hooks/use-users'
 import { MOCK_NAV_ITEMS } from '@/constants/mock-data'
-import { type LucideIcon } from 'lucide-react'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: viewer } = useLinearViewer()
   const { data: teams } = useTeams()
   const { data: projects } = useProjects()
+  const { data: users } = useUsers()
 
   const userData = React.useMemo(() => {
     if (!viewer) return { name: 'User', email: 'user@example.com', avatar: '' }
     return {
-      name: viewer.name,
+      name: viewer.full_name,
       email: viewer.email,
       avatar: viewer.avatar_url || '',
     }
@@ -40,45 +41,42 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }))
   }, [teams])
 
-  const navItems = React.useMemo(() => {
-    // Clone items
-    // Clone items
-    const items = [...MOCK_NAV_ITEMS] as {
-      title: string
-      url: string
-      icon?: LucideIcon
-      isActive?: boolean
-      items?: { title: string; url: string }[]
-    }[]
-
-    // Find Projects item
-    const projectsItemIndex = items.findIndex((item) => item.title === 'Projects')
-
-    if (projectsItemIndex !== -1 && projects) {
-      // Add projects as sub-items
-      items[projectsItemIndex] = {
-        ...items[projectsItemIndex],
-        items: projects.map((p) => ({
-          title: p.name,
-          url: `/projects/${p.id}`, // Assuming we have a detail page, or we want filter?
-          // "go to /project dynamically" - maybe detail page?
-          // For now let's point to projects page with query param or just projects page?
-          // User said "go to /project dynamically".
-          // If they click on a specific project, it should probably go to that project.
-          // But we don't have a project detail page yet.
-          // Let's point to /projects for now, or assume we will build one.
-          // Re-reading: "use go to /project dynamically" -> singular /project.
-
-          // Wait, if I click the PARENT "Projects", it goes to /projects (I set this in mock-data).
-          // If I expand it, and click a project name, generally I expect to go to THAT project.
-          // For now, I'll set url to `/projects` for list items too, or maybe just list them?
-          // Let's assume detail view is desired eventually.
-          // I'll set it to `/projects` so it works with current route.
-        })),
+  // Helper to populate nav items
+  const populateNavItem = <T,>(
+    items: NavItem[],
+    title: string,
+    data: T[] | undefined,
+    mapFn: (item: T) => { title: string; url: string }
+  ) => {
+    const index = items.findIndex((item) => item.title === title)
+    if (index !== -1 && data) {
+      items[index] = {
+        ...items[index],
+        items: data.map(mapFn),
       }
     }
+  }
+
+  const navItems = React.useMemo(() => {
+    const items = [...MOCK_NAV_ITEMS] as NavItem[]
+
+    populateNavItem(items, 'Projects', projects, (p) => ({
+      title: p.name,
+      url: `/projects/${p.id}`,
+    }))
+
+    populateNavItem(items, 'Teams', teams, (t) => ({
+      title: t.name,
+      url: `/teams?id=${t.id}`,
+    }))
+
+    populateNavItem(items, 'Members', users, (u) => ({
+      title: u.full_name || u.email,
+      url: `/settings/members`,
+    }))
+
     return items
-  }, [projects])
+  }, [projects, teams, users])
 
   return (
     <Sidebar collapsible="icon" className="dark border-r-0" {...props}>

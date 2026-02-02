@@ -14,7 +14,7 @@ import {
   SidebarMenuAction,
 } from '@/components/ui/sidebar'
 
-interface NavItem {
+export interface NavItem {
   title: string
   url: string
   icon?: LucideIcon

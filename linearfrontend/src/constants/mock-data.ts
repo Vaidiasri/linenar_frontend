@@ -22,5 +22,3 @@ export const MOCK_NAV_ITEMS = [
     icon: Settings,
   },
 ]
-
-
