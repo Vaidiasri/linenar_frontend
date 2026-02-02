@@ -4,9 +4,10 @@ interface IssueItemProps {
   status: 'in-progress' | 'todo' | 'done'
   priority: 'high' | 'medium' | 'low'
   assignee: string
+  teamName?: string
 }
 
-export function IssueItem({ id, title, status, priority, assignee }: IssueItemProps) {
+export function IssueItem({ id, title, status, priority, assignee, teamName }: IssueItemProps) {
   const statusConfig = {
     'in-progress': {
       borderColor: 'border-orange-500/20',
@@ -72,6 +73,11 @@ export function IssueItem({ id, title, status, priority, assignee }: IssueItemPr
         </p>
       </div>
       <div className="flex items-center gap-2 text-muted-foreground">
+        {teamName && (
+          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-muted/50 border border-border">
+            {teamName}
+          </span>
+        )}
         <div
           className={`size-5 flex items-center justify-center ${priorityStyle.color} ${priorityStyle.bgColor} ${priority === 'high' ? 'rounded-full' : ''}`}
         >
