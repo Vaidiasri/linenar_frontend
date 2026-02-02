@@ -38,6 +38,6 @@ export const createIssue = async (data: CreateIssueData) => {
 }
 
 export const updateIssue = async (id: string, data: Partial<CreateIssueData>) => {
-  const response = await apiClient.put<Issue>(`/issues/${id}`, data)
+  const response = await apiClient.patch<Issue>(`/issues/${id}`, data)
   return response.data
 }

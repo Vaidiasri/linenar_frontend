@@ -37,9 +37,6 @@ export default function Members() {
   const [userToDelete, setUserToDelete] = useState<User | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
 
-  if (isLoading) return <div className="p-8">Loading members...</div>
-  if (error) return <div className="p-8 text-red-500">Error loading members</div>
-
   const handleDeleteUser = () => {
     if (userToDelete) {
       deleteUser(userToDelete.id)
@@ -56,6 +53,9 @@ export default function Members() {
         user.email?.toLowerCase().includes(lowerQuery)
     )
   }, [users, searchQuery])
+
+  if (isLoading) return <div className="p-8">Loading members...</div>
+  if (error) return <div className="p-8 text-red-500">Error loading members</div>
 
   return (
     <PageLayout title="Members" action={<InviteUserSheet />}>
