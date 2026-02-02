@@ -95,6 +95,7 @@ export default function Dashboard() {
                       status={getStatusLabel(issue.status)}
                       priority={getPriorityLabel(issue.priority)}
                       assignee={getAssigneeInitials(issue.assignee)}
+                      teamName={issue.team?.name}
                     />
                     {index < filteredIssues.length - 1 && <div className="h-px bg-border/50" />}
                   </React.Fragment>

@@ -15,6 +15,11 @@ export interface Issue {
     email: string
     avatar_url: string | null
   }
+  team?: {
+    id: string
+    name: string
+    key: string
+  }
 }
 
 export interface CreateIssueData {
