@@ -7,6 +7,8 @@ import { useIssueDetail } from '@/hooks/use-issue-detail'
 import { useUpdateIssue } from '@/hooks/use-issues'
 import { EditableField } from '@/components/editable-field'
 import { PropertySelect, STATUS_OPTIONS, PRIORITY_OPTIONS } from '@/components/property-select'
+import { CommentThread } from '@/components/comment-thread'
+import { useLinearViewer } from '@/hooks/use-linear-viewer'
 
 // Type definitions for better type safety
 type IssueStatus = 'backlog' | 'todo' | 'in_progress' | 'done' | 'canceled'
@@ -54,6 +56,7 @@ export default function IssueDetail() {
   const navigate = useNavigate()
   const { data: issue, isLoading, error } = useIssueDetail(id)
   const { mutate: updateIssue } = useUpdateIssue()
+  const { data: currentUser } = useLinearViewer()
 
   if (isLoading) {
     return <LoadingSkeleton />
@@ -98,7 +101,7 @@ export default function IssueDetail() {
   }
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 flex-col h-screen">
       {/* Header with Breadcrumb */}
       <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
         <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="h-8 gap-1">
@@ -115,84 +118,92 @@ export default function IssueDetail() {
       </header>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-6">
-        <div className="mx-auto max-w-4xl space-y-6">
-          {/* Title Section - Editable */}
+      <div className="flex-1 overflow-y-auto p-3">
+        {/* Title Section - Left Aligned */}
+        <div className="max-w-3xl mb-2">
           <div>
             <EditableField
               value={issue.title}
               onSave={handleTitleUpdate}
               placeholder="Enter issue title..."
-              className="text-3xl font-bold border-none shadow-none px-0"
+              className="text-xl font-bold border-none shadow-none px-0"
             />
-            <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
               <span className="font-mono">#{id?.slice(0, 8).toUpperCase()}</span>
               <span>•</span>
               <span>Created {new Date(issue.created_at).toLocaleDateString()}</span>
             </div>
           </div>
+        </div>
 
-          {/* Description - Editable */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Description</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <EditableField
-                value={issue.description || ''}
-                onSave={handleDescriptionUpdate}
-                placeholder="Add a description..."
-                multiline
-                className="min-h-[100px]"
-              />
-            </CardContent>
-          </Card>
+        {/* Cards Section - 2 Column Grid */}
+        <div className="mx-auto max-w-6xl py-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-9 items-start">
+            {/* Left Column - Description + Properties */}
+            <div className="space-y-2 flex flex-col h-full">
+              {/* Description */}
+              <Card className="flex-1">
+                <CardHeader className="py-2 px-4">
+                  <CardTitle className="text-base">Description</CardTitle>
+                </CardHeader>
+                <CardContent className="px-4 pb-3">
+                  <EditableField
+                    value={issue.description || ''}
+                    onSave={handleDescriptionUpdate}
+                    placeholder="Add a description..."
+                    multiline
+                    className="min-h-[100px] text-sm"
+                  />
+                </CardContent>
+              </Card>
 
-          {/* Properties - Editable Dropdowns */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Properties</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <PropertyRow label="Status">
-                <PropertySelect
-                  value={issue.status}
-                  onValueChange={handleStatusChange}
-                  options={STATUS_OPTIONS}
-                />
-              </PropertyRow>
+              {/* Properties */}
+              <Card>
+                <CardHeader className="py-2 px-4">
+                  <CardTitle className="text-base">Properties</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 px-4 pb-3">
+                  <PropertyRow label="Status">
+                    <PropertySelect
+                      value={issue.status}
+                      onValueChange={handleStatusChange}
+                      options={STATUS_OPTIONS}
+                    />
+                  </PropertyRow>
 
-              <PropertyRow label="Priority">
-                <PropertySelect
-                  value={issue.priority.toString()}
-                  onValueChange={handlePriorityChange}
-                  options={PRIORITY_OPTIONS}
-                />
-              </PropertyRow>
+                  <PropertyRow label="Priority">
+                    <PropertySelect
+                      value={issue.priority.toString()}
+                      onValueChange={handlePriorityChange}
+                      options={PRIORITY_OPTIONS}
+                    />
+                  </PropertyRow>
 
-              <PropertyRow label="Assignee">
-                <span className="text-sm">
-                  {issue.assignee?.full_name || issue.assignee?.email || 'Unassigned'}
-                </span>
-              </PropertyRow>
+                  <PropertyRow label="Assignee">
+                    <span className="text-sm">
+                      {issue.assignee?.full_name || issue.assignee?.email || 'Unassigned'}
+                    </span>
+                  </PropertyRow>
 
-              <PropertyRow label="Team">
-                <span className="text-sm">{issue.team?.name || 'No team'}</span>
-              </PropertyRow>
-            </CardContent>
-          </Card>
+                  <PropertyRow label="Team">
+                    <span className="text-sm">{issue.team?.name || 'No team'}</span>
+                  </PropertyRow>
+                </CardContent>
+              </Card>
+            </div>
 
-          {/* Activity Placeholder */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Activity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground italic">
-                Comments and activity timeline coming in Phase 3...
-              </p>
-            </CardContent>
-          </Card>
+            {/* Right Column - Comments */}
+            <div className="h-full">
+              <Card className="h-full">
+                <CardHeader className="py-2 px-4">
+                  <CardTitle className="text-base">Comments</CardTitle>
+                </CardHeader>
+                <CardContent className="px-4 pb-3">
+                  <CommentThread issueId={id!} currentUserId={currentUser?.id} />
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>
