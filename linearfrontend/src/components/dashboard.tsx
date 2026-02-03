@@ -1,10 +1,14 @@
 import React, { useState, useMemo } from 'react'
-import { Menu as MenuIcon, Search } from 'lucide-react'
+import { Menu as MenuIcon, Search, ListTodo, CheckCircle2, TrendingUp } from 'lucide-react'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { IssueItem } from '@/components/issue-item'
 import { CreateIssueSheet } from '@/components/CreateIssueSheet'
 import { useIssues } from '@/hooks/use-issues'
+import { useDashboard } from '@/hooks/use-dashboard'
 import { Input } from '@/components/ui/input'
+import { StatsCard } from '@/components/stats-card'
+import { StatusChart } from '@/components/status-chart'
+import { PriorityChart } from '@/components/priority-chart'
 
 const getPriorityLabel = (p: number) => {
   switch (p) {
@@ -26,7 +30,7 @@ const getStatusLabel = (s: string): 'todo' | 'in-progress' | 'done' => {
 }
 
 const getAssigneeInitials = (
-  assignee: { full_name?: string; email: string } | null | undefined
+  assignee: { full_name?: string | null; email: string } | null | undefined
 ) => {
   if (!assignee) return 'UN'
   const name = assignee.full_name || assignee.email
@@ -35,6 +39,7 @@ const getAssigneeInitials = (
 
 export default function Dashboard() {
   const { data: issues, isLoading, error } = useIssues()
+  const { data: dashboardStats, isLoading: statsLoading } = useDashboard()
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredIssues = useMemo(() => {
@@ -53,7 +58,7 @@ export default function Dashboard() {
         </div>
         <div className="flex items-center gap-2 px-4 w-full">
           <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
-            My Issues
+            Dashboard
           </span>
           <div className="relative w-full max-w-sm ml-2">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -70,10 +75,45 @@ export default function Dashboard() {
         </div>
       </header>
       <div className="flex flex-1 flex-col gap-4 p-4 pt-4 overflow-y-auto">
+        {/* Analytics Section */}
+        <div className="space-y-4">
+          {/* Stats Cards */}
+          <div className="grid gap-4 md:grid-cols-3">
+            <StatsCard
+              title="Total Issues"
+              value={dashboardStats?.total_issues ?? 0}
+              icon={ListTodo}
+              description="All issues in the system"
+              isLoading={statsLoading}
+            />
+            <StatsCard
+              title="Completed Issues"
+              value={dashboardStats?.completed_issues ?? 0}
+              icon={CheckCircle2}
+              description="Issues marked as done"
+              isLoading={statsLoading}
+            />
+            <StatsCard
+              title="Progress"
+              value={`${dashboardStats?.progress_percentage ?? 0}%`}
+              icon={TrendingUp}
+              description="Overall completion rate"
+              isLoading={statsLoading}
+            />
+          </div>
+
+          {/* Charts */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <StatusChart data={dashboardStats?.status_counts ?? {}} isLoading={statsLoading} />
+            <PriorityChart data={dashboardStats?.priority_counts ?? {}} isLoading={statsLoading} />
+          </div>
+        </div>
+
+        {/* Issues List */}
         <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
           <div className="p-6 space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Today</h2>
+              <h2 className="text-lg font-semibold">My Issues</h2>
               <span className="text-sm text-muted-foreground">Mon, Jan 27</span>
             </div>
 
