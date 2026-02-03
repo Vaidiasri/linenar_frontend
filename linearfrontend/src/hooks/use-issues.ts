@@ -53,10 +53,11 @@ export const useUpdateIssue = () => {
         queryClient.setQueryData(['issues'], context.previousIssues)
       }
     },
-    onSettled: () => {
+    onSettled: (_data, _error, variables) => {
       // Always refetch after error or success to keep data in sync
       queryClient.invalidateQueries({ queryKey: ['issues'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] })
+      queryClient.invalidateQueries({ queryKey: ['issue', variables.id] }) // Invalidate specific issue
     },
   })
 }
