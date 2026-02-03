@@ -114,7 +114,7 @@ export function EditableField({
             onChange={(e) => setEditValue(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
-            className={className}
+            className={`h-auto py-1 ${className}`}
             disabled={isSaving}
           />
         )}
