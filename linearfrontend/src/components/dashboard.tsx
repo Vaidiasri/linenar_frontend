@@ -1,11 +1,19 @@
 import React, { useState, useMemo } from 'react'
-import { Menu as MenuIcon, Search, ListTodo, CheckCircle2, TrendingUp } from 'lucide-react'
+import {
+  Menu as MenuIcon,
+  Search,
+  ListTodo,
+  CheckCircle2,
+  TrendingUp,
+  RefreshCw,
+} from 'lucide-react'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { IssueItem } from '@/components/issue-item'
 import { CreateIssueSheet } from '@/components/CreateIssueSheet'
 import { useIssues } from '@/hooks/use-issues'
 import { useDashboard } from '@/hooks/use-dashboard'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { StatsCard } from '@/components/stats-card'
 import { StatusChart } from '@/components/status-chart'
 import { PriorityChart } from '@/components/priority-chart'
@@ -39,7 +47,11 @@ const getAssigneeInitials = (
 
 export default function Dashboard() {
   const { data: issues, isLoading, error } = useIssues()
-  const { data: dashboardStats, isLoading: statsLoading } = useDashboard()
+  const {
+    data: dashboardStats,
+    isLoading: statsLoading,
+    refetch: refetchDashboard,
+  } = useDashboard()
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredIssues = useMemo(() => {
@@ -69,7 +81,16 @@ export default function Dashboard() {
               className="pl-8 h-8"
             />
           </div>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => refetchDashboard()}
+              disabled={statsLoading}
+              className="h-8"
+            >
+              <RefreshCw className={`h-4 w-4 ${statsLoading ? 'animate-spin' : ''}`} />
+            </Button>
             <CreateIssueSheet />
           </div>
         </div>

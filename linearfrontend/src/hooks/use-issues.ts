@@ -16,7 +16,9 @@ export const useCreateIssue = () => {
   return useMutation({
     mutationFn: (data: CreateIssueData) => createIssue(data),
     onSuccess: () => {
+      // Invalidate both issues and dashboard queries for real-time updates
       queryClient.invalidateQueries({ queryKey: ['issues'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] })
     },
   })
 }
@@ -52,8 +54,9 @@ export const useUpdateIssue = () => {
       }
     },
     onSettled: () => {
-      // Always refetch after error or success:
+      // Always refetch after error or success to keep data in sync
       queryClient.invalidateQueries({ queryKey: ['issues'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] })
     },
   })
 }
