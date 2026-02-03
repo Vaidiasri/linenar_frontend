@@ -5,6 +5,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useUpdateIssue } from '@/hooks/use-issues'
+import { useNavigate } from 'react-router-dom'
 
 interface IssueItemProps {
   id: string
@@ -17,6 +18,7 @@ interface IssueItemProps {
 
 export function IssueItem({ id, title, status, priority, assignee, teamName }: IssueItemProps) {
   const { mutate: updateIssue } = useUpdateIssue()
+  const navigate = useNavigate()
 
   const handleStatusChange = (newStatus: 'todo' | 'in_progress' | 'done') => {
     // Map frontend 'in-progress' to backend 'in_progress' if needed,
@@ -26,6 +28,10 @@ export function IssueItem({ id, title, status, priority, assignee, teamName }: I
 
   const handlePriorityChange = (newPriority: 1 | 2 | 3) => {
     updateIssue({ id, data: { priority: newPriority } })
+  }
+
+  const handleTitleClick = () => {
+    navigate(`/issues/${id}`)
   }
 
   const statusConfig = {
@@ -80,9 +86,10 @@ export function IssueItem({ id, title, status, priority, assignee, teamName }: I
 
       <div className="flex-1 min-w-0">
         <p
-          className={`text-sm font-medium truncate group-hover:text-primary transition-colors ${
+          className={`text-sm font-medium truncate group-hover:text-primary transition-colors cursor-pointer ${
             isDone ? 'text-muted-foreground line-through' : ''
           }`}
+          onClick={handleTitleClick}
         >
           {title}
         </p>

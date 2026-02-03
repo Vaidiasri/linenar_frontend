@@ -6,6 +6,7 @@ import Projects from '@/pages/Projects'
 import ProjectDetail from '@/pages/ProjectDetail'
 import Teams from '@/pages/Teams'
 import Members from '@/pages/Members'
+import IssueDetail from '@/pages/IssueDetail'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { useAuth } from '@/hooks/use-auth'
 
@@ -38,6 +39,7 @@ function AppContent() {
         }
       >
         <Route path="/" element={<Dashboard />} />
+        <Route path="/issues/:id" element={<IssueDetail />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/projects/:projectId" element={<ProjectDetail />} />
         <Route path="/teams" element={<Teams />} />
