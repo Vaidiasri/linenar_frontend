@@ -38,8 +38,40 @@ export function CreateIssueSheet() {
   const { data: teams } = useTeams()
   const { data: users } = useUsers()
 
+  const resetForm = () => {
+    setTitle('')
+    setDescription('')
+    setStatus('todo')
+    setPriority('0')
+    setTeamId('')
+    setAssigneeId('')
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+
+    console.log('DEBUG: Submitting Issue Form')
+    console.log('DEBUG: Form Data:', {
+      title,
+      teamId: teamId,
+      status,
+      priority,
+      assigneeId: assigneeId,
+    })
+
+    if (!title) {
+      console.error('DEBUG: Validation Failed - Missing Title')
+      // Assuming a toast notification system is available, otherwise this line would cause an error.
+      // toast.error('Please enter a title')
+      return
+    }
+    if (!teamId) {
+      console.error('DEBUG: Validation Failed - Missing Team ID')
+      // Assuming a toast notification system is available, otherwise this line would cause an error.
+      // toast.error('Please select a team')
+      return
+    }
+
     mutation.mutate(
       {
         title,
@@ -52,8 +84,6 @@ export function CreateIssueSheet() {
       {
         onSuccess: () => {
           setOpen(false)
-          setTitle('')
-          setDescription('')
           setStatus('todo')
           setPriority('0')
           setTeamId('')

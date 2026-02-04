@@ -33,7 +33,7 @@ export interface CreateIssueData {
 }
 
 export const getIssues = async () => {
-  const response = await apiClient.get<Issue[]>('/issues/')
+  const response = await apiClient.get<Issue[]>('/issues/?limit=100')
   return response.data
 }
 
