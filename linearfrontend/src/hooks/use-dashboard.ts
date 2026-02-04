@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { useAppDispatch } from '@/store/hooks'
 import { setDashboardStats } from '@/store/slices/dashboardSlice'
 import { DashboardStats } from '@/types/dashboard'
 import axios from 'axios'
@@ -26,22 +26,21 @@ const fetchDashboardStats = async (): Promise<DashboardStats> => {
  */
 export const useDashboard = () => {
   const dispatch = useAppDispatch()
-  const refreshInterval = useAppSelector((state) => state.dashboard.refreshInterval)
 
-  const query = useQuery({
+  const { data, isLoading, error } = useQuery<DashboardStats>({
     queryKey: ['dashboard-stats'],
     queryFn: fetchDashboardStats,
-    refetchInterval: refreshInterval * 1000, // Convert to milliseconds
-    staleTime: 10000, // Consider data stale after 10 seconds
-    retry: 2,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false, // Don't refetch on component mount
+    staleTime: Infinity, // Data is fresh until invalidated by WebSocket
   })
 
   // Sync TanStack Query data with Redux store
   useEffect(() => {
-    if (query.data) {
-      dispatch(setDashboardStats(query.data))
+    if (data) {
+      dispatch(setDashboardStats(data))
     }
-  }, [query.data, dispatch])
+  }, [data, dispatch])
 
-  return query
+  return { data, isLoading, error }
 }
