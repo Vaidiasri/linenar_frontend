@@ -7,6 +7,9 @@ export const useIssues = () => {
   return useQuery({
     queryKey: ['issues'],
     queryFn: getIssues,
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnMount: false, // Don't refetch on component mount
+    staleTime: Infinity, // Data is fresh until invalidated by WebSocket
   })
 }
 
