@@ -101,7 +101,7 @@ export default function IssueDetail() {
   }
 
   return (
-    <div className="flex flex-1 flex-col h-screen">
+    <div className="flex flex-1 flex-col">
       {/* Header with Breadcrumb */}
       <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
         <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="h-8 gap-1">
