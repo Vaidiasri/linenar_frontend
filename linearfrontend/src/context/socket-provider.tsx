@@ -1,7 +1,8 @@
 import { createContext, useContext, useEffect, ReactNode } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
+import { useDispatch } from 'react-redux'
 import { toast } from 'sonner'
 import { useSocket } from '@/hooks/use-socket'
+import { apiSlice } from '@/store/api/apiSlice'
 
 // WebSocket URL derivation
 const WS_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080') + '/ws'
@@ -21,7 +22,7 @@ interface SocketProviderProps {
 export function SocketProvider({ children }: SocketProviderProps) {
   const token = localStorage.getItem('access_token')
   const { isConnected, lastMessage } = useSocket(WS_URL, token)
-  const queryClient = useQueryClient()
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (lastMessage) {
@@ -32,23 +33,20 @@ export function SocketProvider({ children }: SocketProviderProps) {
         // Handle different event types
         switch (eventType) {
           case 'ISSUE_CREATED':
-            queryClient.invalidateQueries({ queryKey: ['issues'] })
-            queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] })
+            dispatch(apiSlice.util.invalidateTags(['Issue', 'Dashboard']))
             toast.success(`New issue created: ${data.title}`)
             break
 
           case 'ISSUE_UPDATED':
-            queryClient.invalidateQueries({ queryKey: ['issues'] })
-            queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] })
+            dispatch(apiSlice.util.invalidateTags(['Issue', 'Dashboard']))
             if (data.issue_id) {
-              queryClient.invalidateQueries({ queryKey: ['issue', data.issue_id] })
+              dispatch(apiSlice.util.invalidateTags([{ type: 'Issue', id: data.issue_id }]))
             }
             toast.info(`Issue updated: ${data.title}`)
             break
 
           case 'ISSUE_DELETED':
-            queryClient.invalidateQueries({ queryKey: ['issues'] })
-            queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] })
+            dispatch(apiSlice.util.invalidateTags(['Issue', 'Dashboard']))
             toast.error(`Issue deleted: ${data.title}`)
             break
 
@@ -59,7 +57,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
         console.error('Failed to parse WebSocket message:', error)
       }
     }
-  }, [lastMessage, queryClient])
+  }, [lastMessage, dispatch])
 
   return <SocketContext.Provider value={{ isConnected }}>{children}</SocketContext.Provider>
 }

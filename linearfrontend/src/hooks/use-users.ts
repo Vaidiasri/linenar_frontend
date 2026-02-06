@@ -1,31 +1,28 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getUsers, updateUser, deleteUser } from '@/api/user'
+import {
+  useGetUsersQuery,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+} from '@/store/api/apiSlice'
+import type { UpdateUserData } from '@/api/user'
 
 export const useUsers = () => {
-  return useQuery({
-    queryKey: ['users'],
-    queryFn: getUsers,
-  })
+  return useGetUsersQuery()
 }
 
 export const useUpdateUser = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Parameters<typeof updateUser>[1] }) =>
-      updateUser(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] })
-      queryClient.invalidateQueries({ queryKey: ['me'] }) // Assuming useAuth (me) uses this key
-    },
-  })
+  const [updateUser, result] = useUpdateUserMutation()
+  return {
+    mutate: (variables: { id: string; data: UpdateUserData }) => updateUser(variables),
+    ...result,
+    isPending: result.isLoading,
+  }
 }
 
 export const useDeleteUser = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: deleteUser,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] })
-    },
-  })
+  const [deleteUser, result] = useDeleteUserMutation()
+  return {
+    mutate: deleteUser,
+    ...result,
+    isPending: result.isLoading,
+  }
 }

@@ -1,66 +1,31 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getIssues, createIssue, updateIssue, CreateIssueData, Issue } from '@/api/issue'
+import {
+  useGetIssuesQuery,
+  useCreateIssueMutation,
+  useUpdateIssueMutation,
+} from '@/store/api/apiSlice'
+
+import type { CreateIssueData } from '@/api/issue'
 
 export type { Issue } from '@/api/issue'
 
 export const useIssues = () => {
-  return useQuery({
-    queryKey: ['issues'],
-    queryFn: getIssues,
-    refetchOnWindowFocus: false, // Don't refetch on window focus
-    refetchOnMount: false, // Don't refetch on component mount
-    staleTime: Infinity, // Data is fresh until invalidated by WebSocket
-  })
+  return useGetIssuesQuery()
 }
 
 export const useCreateIssue = () => {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (data: CreateIssueData) => createIssue(data),
-    onSuccess: () => {
-      // Invalidate both issues and dashboard queries for real-time updates
-      queryClient.invalidateQueries({ queryKey: ['issues'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] })
-    },
-  })
+  const [createIssue, result] = useCreateIssueMutation()
+  return {
+    mutate: createIssue,
+    ...result,
+    isPending: result.isLoading, // Alias for TanStack compatibility
+  }
 }
 
 export const useUpdateIssue = () => {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<CreateIssueData> }) =>
-      updateIssue(id, data),
-    onMutate: async ({ id, data }) => {
-      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({ queryKey: ['issues'] })
-
-      // Snapshot the previous value
-      const previousIssues = queryClient.getQueryData<Issue[]>(['issues'])
-
-      // Optimistically update to the new value
-      if (previousIssues) {
-        queryClient.setQueryData<Issue[]>(['issues'], (old) => {
-          if (!old) return []
-          return old.map((issue) => (issue.id === id ? { ...issue, ...data } : issue))
-        })
-      }
-
-      // Return a context object with the snapshotted value
-      return { previousIssues }
-    },
-    onError: (_err, _newIssue, context) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
-      if (context?.previousIssues) {
-        queryClient.setQueryData(['issues'], context.previousIssues)
-      }
-    },
-    onSettled: (_data, _error, variables) => {
-      // Always refetch after error or success to keep data in sync
-      queryClient.invalidateQueries({ queryKey: ['issues'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] })
-      queryClient.invalidateQueries({ queryKey: ['issue', variables.id] }) // Invalidate specific issue
-    },
-  })
+  const [updateIssue, result] = useUpdateIssueMutation()
+  return {
+    mutate: (variables: { id: string; data: Partial<CreateIssueData> }) => updateIssue(variables),
+    ...result,
+    isPending: result.isLoading,
+  }
 }

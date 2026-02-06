@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useCreateTeam } from '@/hooks/use-teams'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -22,18 +22,16 @@ export function CreateTeamSheet() {
 
   const mutation = useCreateTeam()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    mutation.mutate(
-      { name, key },
-      {
-        onSuccess: () => {
-          setOpen(false)
-          setName('')
-          setKey('')
-        },
-      }
-    )
+    try {
+      await mutation.mutate({ name, key }).unwrap()
+      setOpen(false)
+      setName('')
+      setKey('')
+    } catch (error) {
+      console.error('Failed to create team', error)
+    }
   }
 
   return (

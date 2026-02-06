@@ -1,6 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import { getProject } from '@/api/project'
+import { useGetProjectQuery } from '@/store/api/apiSlice'
 import { PageLayout } from '@/components/page-layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -11,10 +10,8 @@ export default function ProjectDetail() {
     data: project,
     isLoading,
     error,
-  } = useQuery({
-    queryKey: ['project', projectId],
-    queryFn: () => getProject(projectId!),
-    enabled: !!projectId,
+  } = useGetProjectQuery(projectId!, {
+    skip: !projectId,
   })
 
   if (isLoading) return <div className="p-8">Loading project details...</div>

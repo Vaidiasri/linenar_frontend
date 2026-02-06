@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createProject } from '@/api/project'
+import { useCreateProjectMutation } from '@/store/api/apiSlice'
 import { useTeams } from '@/hooks/use-teams'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,27 +30,23 @@ export function CreateProjectSheet() {
   const [teamId, setTeamId] = useState('')
 
   const { data: teams } = useTeams()
-  const queryClient = useQueryClient()
 
-  const mutation = useMutation({
-    mutationFn: createProject,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] })
+  const [createProject, { isLoading: isCreating }] = useCreateProjectMutation()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!teamId) return
+
+    try {
+      await createProject({ name, description, team_id: teamId }).unwrap()
       setOpen(false)
       setName('')
       setDescription('')
       setTeamId('')
-    },
-    onError: (error) => {
+    } catch (error) {
       console.error('Failed to create project', error)
       // Add toast notification later
-    },
-  })
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!teamId) return // Add validation
-    mutation.mutate({ name, description, team_id: teamId })
+    }
   }
 
   return (
@@ -108,8 +103,8 @@ export function CreateProjectSheet() {
                 Cancel
               </Button>
             </SheetClose>
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? 'Creating...' : 'Create Project'}
+            <Button type="submit" disabled={isCreating}>
+              {isCreating ? 'Creating...' : 'Create Project'}
             </Button>
           </SheetFooter>
         </form>

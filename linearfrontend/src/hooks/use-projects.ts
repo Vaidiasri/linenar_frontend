@@ -1,9 +1,5 @@
-import { useQuery } from '@tanstack/react-query'
-import { getProjects } from '@/api/project'
+import { useGetProjectsQuery } from '@/store/api/apiSlice'
 
 export const useProjects = () => {
-  return useQuery({
-    queryKey: ['projects'],
-    queryFn: getProjects,
-  })
+  return useGetProjectsQuery()
 }

@@ -48,6 +48,7 @@ export function CommentItem({ comment, currentUserId, onUpdate, onDelete }: Comm
       await onDelete(comment.id)
     } catch (err) {
       setIsDeleting(false)
+      // eslint-disable-next-line no-useless-catch
       throw err
     }
   }

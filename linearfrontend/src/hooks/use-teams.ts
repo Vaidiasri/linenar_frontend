@@ -1,40 +1,39 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getTeams, createTeam, updateTeam, deleteTeam } from '@/api/team'
+import {
+  useGetTeamsQuery,
+  useCreateTeamMutation,
+  useUpdateTeamMutation,
+  useDeleteTeamMutation,
+} from '@/store/api/apiSlice'
+
+import type { UpdateTeamData } from '@/api/team'
 
 export const useTeams = () => {
-  return useQuery({
-    queryKey: ['teams'],
-    queryFn: getTeams,
-  })
+  return useGetTeamsQuery()
 }
 
 export const useCreateTeam = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: createTeam,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teams'] })
-    },
-  })
+  const [createTeam, result] = useCreateTeamMutation()
+  return {
+    mutate: createTeam,
+    ...result,
+    isPending: result.isLoading,
+  }
 }
 
 export const useUpdateTeam = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Parameters<typeof updateTeam>[1] }) =>
-      updateTeam(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teams'] })
-    },
-  })
+  const [updateTeam, result] = useUpdateTeamMutation()
+  return {
+    mutate: (variables: { id: string; data: UpdateTeamData }) => updateTeam(variables),
+    ...result,
+    isPending: result.isLoading,
+  }
 }
 
 export const useDeleteTeam = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: deleteTeam,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teams'] })
-    },
-  })
+  const [deleteTeam, result] = useDeleteTeamMutation()
+  return {
+    mutate: deleteTeam,
+    ...result,
+    isPending: result.isLoading,
+  }
 }

@@ -47,7 +47,7 @@ export function CreateIssueSheet() {
     setAssigneeId('')
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     console.log('DEBUG: Submitting Issue Form')
@@ -72,25 +72,23 @@ export function CreateIssueSheet() {
       return
     }
 
-    mutation.mutate(
-      {
-        title,
-        description,
-        status,
-        priority: parseInt(priority) as 0 | 1 | 2 | 3,
-        team_id: teamId || undefined,
-        assignee_id: assigneeId || undefined,
-      },
-      {
-        onSuccess: () => {
-          setOpen(false)
-          setStatus('todo')
-          setPriority('0')
-          setTeamId('')
-          setAssigneeId('')
-        },
-      }
-    )
+    try {
+      await mutation
+        .mutate({
+          title,
+          description,
+          status,
+          priority: parseInt(priority) as 0 | 1 | 2 | 3,
+          team_id: teamId || undefined,
+          assignee_id: assigneeId || undefined,
+        })
+        .unwrap()
+
+      setOpen(false)
+      resetForm()
+    } catch (error) {
+      console.error('Failed to create issue', error)
+    }
   }
 
   return (

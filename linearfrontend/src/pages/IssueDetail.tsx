@@ -21,7 +21,8 @@ interface ErrorConfig {
 }
 
 // Pure function to get error configuration
-function getErrorConfig(is401: boolean, is404: boolean, error: Error): ErrorConfig {
+// Pure function to get error configuration
+function getErrorConfig(is401: boolean, is404: boolean, error: unknown): ErrorConfig {
   if (is401) {
     return {
       title: 'Authentication Error',
@@ -38,9 +39,12 @@ function getErrorConfig(is401: boolean, is404: boolean, error: Error): ErrorConf
     }
   }
 
+  const err = error as { data?: { message?: string }; message?: string }
+  const message = err?.data?.message || err?.message || 'An unknown error occurred'
+
   return {
     title: 'Error Loading Issue',
-    message: error.message,
+    message,
     showLoginButton: false,
   }
 }
@@ -75,17 +79,10 @@ export default function IssueDetail() {
   }
 
   // Generic update handler factory - eliminates code duplication
+  // Generic update handler factory - eliminates code duplication
   const createUpdateHandler = (field: 'title' | 'description') => {
     return async (newValue: string) => {
-      return new Promise<void>((resolve, reject) => {
-        updateIssue(
-          { id: id!, data: { [field]: newValue } },
-          {
-            onSuccess: () => resolve(),
-            onError: (err) => reject(err),
-          }
-        )
-      })
+      await updateIssue({ id: id!, data: { [field]: newValue } }).unwrap()
     }
   }
 
@@ -243,7 +240,7 @@ function ErrorState({
   is404,
   onBack,
 }: {
-  error: Error
+  error: unknown
   is401?: boolean
   is404?: boolean
   onBack: () => void
