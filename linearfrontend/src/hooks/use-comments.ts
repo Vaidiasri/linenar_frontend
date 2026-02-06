@@ -1,70 +1,20 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import apiClient from '../api/axios'
+import {
+  useGetCommentsQuery,
+  useCreateCommentMutation,
+  useUpdateCommentMutation,
+  useDeleteCommentMutation,
+} from '@/store/api/apiSlice'
+import type { CommentCreate } from '@/types/comment'
 
-// Type definitions
-interface CommentUser {
-  id: string
-  email: string
-  full_name: string | null
-}
-
-export interface Comment {
-  id: string
-  content: string
-  issue_id: string
-  author_id: string
-  created_at: string
-  author: CommentUser
-}
-
-interface CommentCreate {
-  content: string
-}
-
-/**
- * Fetch all comments for an issue
- */
-const fetchComments = async (issueId: string): Promise<Comment[]> => {
-  const response = await apiClient.get(`/issues/${issueId}/comments`)
-  return response.data
-}
-
-/**
- * Create a new comment
- */
-const createComment = async (issueId: string, data: CommentCreate): Promise<Comment> => {
-  const response = await apiClient.post(`/issues/${issueId}/comments`, data)
-  return response.data
-}
-
-/**
- * Update an existing comment
- */
-const updateComment = async (
-  issueId: string,
-  commentId: string,
-  data: CommentCreate
-): Promise<Comment> => {
-  const response = await apiClient.put(`/issues/${issueId}/comments/${commentId}`, data)
-  return response.data
-}
-
-/**
- * Delete a comment
- */
-const deleteComment = async (issueId: string, commentId: string): Promise<void> => {
-  await apiClient.delete(`/issues/${issueId}/comments/${commentId}`)
-}
+// Exporting types for consumers if needed, though direct import is preferred
+export type { Comment } from '@/types/comment'
 
 /**
  * Hook to fetch all comments for an issue
  */
 export const useComments = (issueId: string | undefined) => {
-  return useQuery({
-    queryKey: ['comments', issueId],
-    queryFn: () => fetchComments(issueId!),
-    enabled: !!issueId,
-    staleTime: 30000,
+  return useGetCommentsQuery(issueId!, {
+    skip: !issueId,
   })
 }
 
@@ -72,41 +22,42 @@ export const useComments = (issueId: string | undefined) => {
  * Hook to create a new comment
  */
 export const useCreateComment = (issueId: string) => {
-  const queryClient = useQueryClient()
+  const [createComment, result] = useCreateCommentMutation()
 
-  return useMutation({
-    mutationFn: (data: CommentCreate) => createComment(issueId, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['comments', issueId] })
-    },
-  })
+  return {
+    mutate: (data: CommentCreate) => createComment({ issueId, data }),
+    ...result,
+    isPending: result.isLoading,
+  }
 }
 
 /**
  * Hook to update a comment
  */
 export const useUpdateComment = (issueId: string) => {
-  const queryClient = useQueryClient()
+  const [updateComment, result] = useUpdateCommentMutation()
 
-  return useMutation({
-    mutationFn: ({ commentId, content }: { commentId: string; content: string }) =>
-      updateComment(issueId, commentId, { content }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['comments', issueId] })
-    },
-  })
+  return {
+    mutate: (variables: { commentId: string; content: string }) =>
+      updateComment({
+        issueId,
+        commentId: variables.commentId,
+        data: { content: variables.content },
+      }),
+    ...result,
+    isPending: result.isLoading,
+  }
 }
 
 /**
  * Hook to delete a comment
  */
 export const useDeleteComment = (issueId: string) => {
-  const queryClient = useQueryClient()
+  const [deleteComment, result] = useDeleteCommentMutation()
 
-  return useMutation({
-    mutationFn: (commentId: string) => deleteComment(issueId, commentId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['comments', issueId] })
-    },
-  })
+  return {
+    mutate: (commentId: string) => deleteComment({ issueId, commentId }),
+    ...result,
+    isPending: result.isLoading,
+  }
 }

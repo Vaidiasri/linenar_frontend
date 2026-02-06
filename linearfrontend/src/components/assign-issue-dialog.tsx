@@ -58,17 +58,15 @@ export function AssignIssueDialog({ user, open, onOpenChange }: AssignIssueDialo
     })
   }, [issues, search, selectedProjectId, selectedTeamId])
 
-  const handleAssign = (issueId: string) => {
+  const handleAssign = async (issueId: string) => {
     if (!user) return
 
-    updateIssue(
-      { id: issueId, data: { assignee_id: String(user.id) } },
-      {
-        onSuccess: () => {
-          onOpenChange(false)
-        },
-      }
-    )
+    try {
+      await updateIssue({ id: issueId, data: { assignee_id: String(user.id) } }).unwrap()
+      onOpenChange(false)
+    } catch (error) {
+      console.error('Failed to assign issue', error)
+    }
   }
 
   return (

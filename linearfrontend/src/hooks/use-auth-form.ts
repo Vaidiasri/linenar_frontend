@@ -1,14 +1,12 @@
-import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { LoginSchema, RegisterSchema } from '@/types/auth'
-import type { LoginPayload, RegisterPayload } from '@/types/auth'
 import { formatZodErrors } from '@/lib/utils'
-import apiClient from '@/api/axios'
+import { useLoginMutation, useRegisterMutation } from '@/store/api/apiSlice'
 
 /**
  * Custom hook for handling authentication form state and mutations
  * Manages login and registration flows with validation and error handling
- * Complexity: 1 (simple state management and API calls)
+ * Complexity: 1 (complex logic delegating to apiSlice)
  */
 export function useAuthForm() {
   const [activeTab, setActiveTab] = useState('login')
@@ -24,71 +22,11 @@ export function useAuthForm() {
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   // Login Mutation
-  const loginMutation = useMutation({
-    mutationFn: async (data: LoginPayload) => {
-      // Backend expects OAuth2PasswordRequestForm (FormData)
-      const formData = new FormData()
-      formData.append('username', data.email) // Map email to username
-      formData.append('password', data.password)
-
-      const response = await apiClient.post('/auth/login', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data', // Required for OAuth2 form
-        },
-      })
-      return response.data
-    },
-    onSuccess: (data) => {
-      console.log('Login Successful:', data)
-      if (data.access_token) {
-        localStorage.setItem('access_token', data.access_token)
-        // Dispatch event or callback to update auth context?
-        // For now, simple reload or redirect logic would be handled by the consumer of this hook or global state
-        window.location.href = '/' // Simple redirect for now
-      }
-    },
-    onError: (error: unknown) => {
-      console.error('Login Failed:', error)
-      const msg =
-        (error as { response?: { data?: { detail?: string } } }).response?.data?.detail ||
-        'Login failed. Please check your credentials.'
-      setErrors({ root: msg })
-    },
-  })
-
+  const [login, { isLoading: isLoginLoading }] = useLoginMutation()
   // Register Mutation
-  const registerMutation = useMutation({
-    mutationFn: async (data: RegisterPayload) => {
-      // Backend expects UserCreate schema (JSON)
-      const payload = {
-        email: data.email,
-        password: data.password,
-        full_name: data.name, // Map name to full_name
-      }
+  const [register, { isLoading: isRegisterLoading }] = useRegisterMutation()
 
-      const response = await apiClient.post('/users/', payload)
-      return response.data
-    },
-    onSuccess: (data) => {
-      console.log('Register Successful:', data)
-      // Auto login after register? Or switch tab?
-      // For now, let's switch to login tab and prefill
-      setActiveTab('login')
-      setEmail(newEmail)
-      setPassword(newPassword)
-      setErrors({})
-      alert('Registration successful! Please login.')
-    },
-    onError: (error: unknown) => {
-      console.error('Register Failed:', error)
-      const msg =
-        (error as { response?: { data?: { detail?: string } } }).response?.data?.detail ||
-        'Registration failed.'
-      setErrors({ root: msg })
-    },
-  })
-
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Validate with Zod
     const result = LoginSchema.safeParse({ email, password })
 
@@ -98,10 +36,23 @@ export function useAuthForm() {
     }
 
     setErrors({}) // Clear errors
-    loginMutation.mutate({ email, password })
+    try {
+      const data = await login({ email, password }).unwrap()
+      console.log('Login Successful:', data)
+      if (data.access_token) {
+        localStorage.setItem('access_token', data.access_token)
+        window.location.href = '/'
+      }
+    } catch (error) {
+      console.error('Login Failed:', error)
+      const msg =
+        (error as { data?: { detail?: string } })?.data?.detail ||
+        'Login failed. Please check your credentials.'
+      setErrors({ root: msg })
+    }
   }
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     const result = RegisterSchema.safeParse({
       name: newName,
       email: newEmail,
@@ -114,7 +65,23 @@ export function useAuthForm() {
     }
 
     setErrors({}) // Clear errors
-    registerMutation.mutate({ name: newName, email: newEmail, password: newPassword })
+    try {
+      const data = await register({
+        name: newName,
+        email: newEmail,
+        password: newPassword,
+      }).unwrap()
+      console.log('Register Successful:', data)
+      setActiveTab('login')
+      setEmail(newEmail)
+      setPassword(newPassword)
+      setErrors({})
+      alert('Registration successful! Please login.')
+    } catch (error) {
+      console.error('Register Failed:', error)
+      const msg = (error as { data?: { detail?: string } })?.data?.detail || 'Registration failed.'
+      setErrors({ root: msg })
+    }
   }
 
   return {
@@ -125,6 +92,6 @@ export function useAuthForm() {
     errors,
     handleLogin,
     handleRegister,
-    isLoading: loginMutation.isPending || registerMutation.isPending,
+    isLoading: isLoginLoading || isRegisterLoading,
   }
 }

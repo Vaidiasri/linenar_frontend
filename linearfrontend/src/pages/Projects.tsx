@@ -1,19 +1,11 @@
-import { useQuery } from '@tanstack/react-query'
-import { getProjects } from '../api/project'
+import { useGetProjectsQuery } from '@/store/api/apiSlice'
 import { CreateProjectSheet } from '../components/CreateProjectSheet'
 import { PageLayout } from '@/components/page-layout'
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Link } from 'react-router-dom'
 
 export default function Projects() {
-  const {
-    data: projects,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['projects'],
-    queryFn: getProjects,
-  })
+  const { data: projects, isLoading, error } = useGetProjectsQuery()
 
   if (isLoading) return <div className="p-8">Loading projects...</div>
   if (error) return <div className="p-8 text-red-500">Error loading projects</div>

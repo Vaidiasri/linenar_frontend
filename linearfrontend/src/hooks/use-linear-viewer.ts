@@ -1,15 +1,5 @@
-import { useQuery } from '@tanstack/react-query'
-import apiClient from '@/api/axios'
-import type { User } from '@/types/user'
-
-const fetchViewer = async (): Promise<User> => {
-  const { data } = await apiClient.get<User>('/users/me')
-  return data
-}
+import { useGetViewerQuery } from '@/store/api/apiSlice'
 
 export const useLinearViewer = () => {
-  return useQuery({
-    queryKey: ['viewer'],
-    queryFn: fetchViewer,
-  })
+  return useGetViewerQuery()
 }

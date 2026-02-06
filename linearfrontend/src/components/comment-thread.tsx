@@ -25,15 +25,15 @@ export function CommentThread({ issueId, currentUserId }: CommentThreadProps) {
   const deleteMutation = useDeleteComment(issueId)
 
   const handleCreate = async (content: string) => {
-    await createMutation.mutateAsync({ content })
+    await createMutation.mutate({ content })
   }
 
   const handleUpdate = async (commentId: string, content: string) => {
-    await updateMutation.mutateAsync({ commentId, content })
+    await updateMutation.mutate({ commentId, content })
   }
 
   const handleDelete = async (commentId: string) => {
-    await deleteMutation.mutateAsync(commentId)
+    await deleteMutation.mutate(commentId)
   }
 
   if (isLoading) {
@@ -79,10 +79,12 @@ function LoadingSkeleton() {
   )
 }
 
-function ErrorState({ error }: { error: Error }) {
+function ErrorState({ error }: { error: unknown }) {
+  const err = error as { data?: { message?: string }; message?: string }
+  const message = err?.data?.message || err?.message || 'Unknown error'
   return (
     <Alert variant="destructive">
-      <AlertDescription>Failed to load comments: {error.message}</AlertDescription>
+      <AlertDescription>Failed to load comments: {message}</AlertDescription>
     </Alert>
   )
 }
