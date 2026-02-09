@@ -3,8 +3,13 @@ import type { Issue, CreateIssueData } from '@/api/issue'
 
 export const issuesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getIssues: builder.query<Issue[], void>({
-      query: () => '/issues/?limit=100',
+    getIssues: builder.query<Issue[], { projectId?: string } | void>({
+      query: (params) => {
+        if (params && params.projectId) {
+          return `/issues/?project_id=${params.projectId}&limit=100`
+        }
+        return '/issues/?limit=100'
+      },
       providesTags: (result) =>
         result
           ? [
