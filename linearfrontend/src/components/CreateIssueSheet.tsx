@@ -1,7 +1,6 @@
-import React, { useState } from 'react'
-import { useCreateIssue } from '@/hooks/use-issues'
-import { useTeams } from '@/hooks/use-teams'
-import { useUsers } from '@/hooks/use-users'
+import { useState } from 'react'
+import { useCreateIssueForm } from '@/hooks/use-create-issue-form'
+import { useIssueFormData } from '@/hooks/use-issue-form-data'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -27,69 +26,10 @@ import { Plus } from 'lucide-react'
 
 export function CreateIssueSheet() {
   const [open, setOpen] = useState(false)
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [status, setStatus] = useState<'backlog' | 'todo' | 'in_progress' | 'done'>('todo')
-  const [priority, setPriority] = useState<string>('0')
-  const [teamId, setTeamId] = useState<string>('')
-  const [assigneeId, setAssigneeId] = useState<string>('')
-
-  const mutation = useCreateIssue()
-  const { data: teams } = useTeams()
-  const { data: users } = useUsers()
-
-  const resetForm = () => {
-    setTitle('')
-    setDescription('')
-    setStatus('todo')
-    setPriority('0')
-    setTeamId('')
-    setAssigneeId('')
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    console.log('DEBUG: Submitting Issue Form')
-    console.log('DEBUG: Form Data:', {
-      title,
-      teamId: teamId,
-      status,
-      priority,
-      assigneeId: assigneeId,
-    })
-
-    if (!title) {
-      console.error('DEBUG: Validation Failed - Missing Title')
-      // Assuming a toast notification system is available, otherwise this line would cause an error.
-      // toast.error('Please enter a title')
-      return
-    }
-    if (!teamId) {
-      console.error('DEBUG: Validation Failed - Missing Team ID')
-      // Assuming a toast notification system is available, otherwise this line would cause an error.
-      // toast.error('Please select a team')
-      return
-    }
-
-    try {
-      await mutation
-        .mutate({
-          title,
-          description,
-          status,
-          priority: parseInt(priority) as 0 | 1 | 2 | 3,
-          team_id: teamId || undefined,
-          assignee_id: assigneeId || undefined,
-        })
-        .unwrap()
-
-      setOpen(false)
-      resetForm()
-    } catch (error) {
-      console.error('Failed to create issue', error)
-    }
-  }
+  const { formState, setters, handleSubmit, isPending } = useCreateIssueForm({
+    onSuccess: () => setOpen(false),
+  })
+  const { teams, users, teamProjects } = useIssueFormData(formState.teamId)
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -110,17 +50,16 @@ export function CreateIssueSheet() {
             <Input
               id="title"
               placeholder="Issue title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={formState.title}
+              onChange={(e) => setters.setTitle(e.target.value)}
               required
             />
           </div>
 
-          {/* Grid layout for dropdowns */}
           <div className="grid grid-cols-2 gap-4 w-[90%] mx-auto">
             <div className="space-y-2">
               <Label htmlFor="team">Team</Label>
-              <Select value={teamId} onValueChange={setTeamId}>
+              <Select value={formState.teamId} onValueChange={setters.setTeamId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select team" />
                 </SelectTrigger>
@@ -136,10 +75,7 @@ export function CreateIssueSheet() {
 
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select
-                value={status}
-                onValueChange={(v: 'backlog' | 'todo' | 'in_progress' | 'done') => setStatus(v)}
-              >
+              <Select value={formState.status} onValueChange={(v: any) => setters.setStatus(v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
@@ -154,7 +90,7 @@ export function CreateIssueSheet() {
 
             <div className="space-y-2">
               <Label htmlFor="priority">Priority</Label>
-              <Select value={priority} onValueChange={setPriority}>
+              <Select value={formState.priority} onValueChange={setters.setPriority}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
@@ -169,7 +105,7 @@ export function CreateIssueSheet() {
 
             <div className="space-y-2">
               <Label htmlFor="assignee">Assignee</Label>
-              <Select value={assigneeId} onValueChange={setAssigneeId}>
+              <Select value={formState.assigneeId} onValueChange={setters.setAssigneeId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Assign to..." />
                 </SelectTrigger>
@@ -177,6 +113,29 @@ export function CreateIssueSheet() {
                   {users?.map((user) => (
                     <SelectItem key={user.id} value={String(user.id)}>
                       {user.full_name || user.email}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2 col-span-2">
+              <Label htmlFor="project">Project (Optional)</Label>
+              <Select
+                value={formState.projectId}
+                onValueChange={setters.setProjectId}
+                disabled={!formState.teamId}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={formState.teamId ? 'Select project' : 'Select team first'}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="no_project">No Project</SelectItem>
+                  {teamProjects.map((project) => (
+                    <SelectItem key={project.id} value={project.id}>
+                      {project.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -190,8 +149,8 @@ export function CreateIssueSheet() {
               id="description"
               placeholder="Add a description..."
               className="resize-none min-h-[100px]"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={formState.description}
+              onChange={(e) => setters.setDescription(e.target.value)}
             />
           </div>
 
@@ -201,8 +160,8 @@ export function CreateIssueSheet() {
                 Cancel
               </Button>
             </SheetClose>
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? 'Creating...' : 'Create Issue'}
+            <Button type="submit" disabled={isPending}>
+              {isPending ? 'Creating...' : 'Create Issue'}
             </Button>
           </SheetFooter>
         </form>
