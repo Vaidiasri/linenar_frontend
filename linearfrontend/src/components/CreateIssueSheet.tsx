@@ -29,7 +29,7 @@ export function CreateIssueSheet() {
   const { formState, setters, handleSubmit, isPending } = useCreateIssueForm({
     onSuccess: () => setOpen(false),
   })
-  const { teams, users, teamProjects } = useIssueFormData(formState.teamId)
+  const { teams, users, teamProjects, cycles } = useIssueFormData(formState.teamId)
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -136,6 +136,29 @@ export function CreateIssueSheet() {
                   {teamProjects.map((project) => (
                     <SelectItem key={project.id} value={project.id}>
                       {project.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2 col-span-2">
+              <Label htmlFor="cycle">Cycle (Optional)</Label>
+              <Select
+                value={formState.cycleId}
+                onValueChange={setters.setCycleId}
+                disabled={!formState.teamId}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={formState.teamId ? 'Select cycle' : 'Select team first'}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="no_cycle">No Cycle</SelectItem>
+                  {cycles?.map((cycle) => (
+                    <SelectItem key={cycle.id} value={cycle.id}>
+                      {cycle.name} {cycle.is_active ? '(Active)' : ''}
                     </SelectItem>
                   ))}
                 </SelectContent>

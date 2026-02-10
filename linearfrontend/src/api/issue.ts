@@ -20,6 +20,8 @@ export interface Issue {
     name: string
     key: string
   }
+  assigned_to_id?: string
+  cycle_id?: string
   created_at: string
   updated_at: string
 }
@@ -49,6 +51,7 @@ export interface CreateIssueData {
   team_id?: string
   project_id?: string
   assignee_id?: string
+  cycle_id?: string
 }
 
 export const getIssues = async () => {

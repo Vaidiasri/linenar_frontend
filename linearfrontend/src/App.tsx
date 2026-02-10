@@ -5,6 +5,8 @@ import Dashboard from '@/components/dashboard'
 import Projects from '@/pages/Projects'
 import ProjectDetail from '@/pages/ProjectDetail'
 import Teams from '@/pages/Teams'
+import Cycles from '@/pages/Cycles'
+import CycleDetail from '@/pages/CycleDetail'
 import Members from '@/pages/Members'
 import IssueDetail from '@/pages/IssueDetail'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
@@ -43,6 +45,8 @@ function AppContent() {
         <Route path="/projects" element={<Projects />} />
         <Route path="/projects/:projectId" element={<ProjectDetail />} />
         <Route path="/teams" element={<Teams />} />
+        <Route path="/cycles" element={<Cycles />} />
+        <Route path="/cycles/:id" element={<CycleDetail />} />
         <Route path="/settings/members" element={<Members />} />
       </Route>
     </Routes>
