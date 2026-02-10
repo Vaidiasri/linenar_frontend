@@ -24,6 +24,23 @@ export interface Issue {
   updated_at: string
 }
 
+export interface Activity {
+  id: string
+  issue_id: string
+  user_id: string
+  user?: {
+    id: string
+    full_name: string | null
+    email: string
+    avatar_url: string | null
+  }
+  type: 'comment' | 'status_change' | 'priority_change' | 'assignee_change' | 'created'
+  content: string // For comments
+  old_value?: string
+  new_value?: string
+  created_at: string
+}
+
 export interface CreateIssueData {
   title: string
   description?: string
