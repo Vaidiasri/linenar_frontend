@@ -1,9 +1,10 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useGetIssuesQuery } from '@/store/api/endpoints/issues'
 import { useLinearViewer } from '@/hooks/use-linear-viewer'
+import { useViewFilter } from '@/hooks/use-view-filter'
 import { KanbanBoard } from '@/components/KanbanBoard'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Disc, UserCircle, Clock } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export default function ViewDetail() {
@@ -12,37 +13,13 @@ export default function ViewDetail() {
   const { data: viewer } = useLinearViewer()
   const { data: issues, isLoading } = useGetIssuesQuery()
 
+  const { title, Icon, filteredIssues } = useViewFilter(id, issues, viewer)
+
   if (isLoading) {
     return (
       <div className="p-4">
         <Skeleton className="h-48 w-full" />
       </div>
-    )
-  }
-
-  let filteredIssues = issues || []
-  let title = 'View'
-  let Icon = Disc
-
-  if (id === 'my-issues') {
-    title = 'My Issues'
-    Icon = Disc
-    if (viewer) {
-      filteredIssues = filteredIssues.filter((issue) => issue.assignee_id === viewer.id)
-    }
-  } else if (id === 'created') {
-    title = 'Created by Me'
-    Icon = UserCircle
-    // Assuming backend doesn't return creator_id yet or we don't have it in Issue type
-    // For now, let's just show all issues or empty if we can't filter
-    // To implement real "Created by Me", we need creator_id in Issue model
-    // filteredIssues = filteredIssues.filter(issue => issue.creator_id === viewer.id)
-    filteredIssues = [] // Placeholder until backend supports it
-  } else if (id === 'recent') {
-    title = 'Recently Updated'
-    Icon = Clock
-    filteredIssues = [...filteredIssues].sort(
-      (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
     )
   }
 
