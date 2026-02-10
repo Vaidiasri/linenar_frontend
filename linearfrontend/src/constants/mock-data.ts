@@ -1,4 +1,4 @@
-import { Home, Folder, Users, Settings, RotateCw } from 'lucide-react'
+import { Home, Folder, Users, Settings, RotateCw, LayoutList } from 'lucide-react'
 
 export const MOCK_NAV_ITEMS = [
   {
@@ -10,6 +10,11 @@ export const MOCK_NAV_ITEMS = [
     title: 'Projects',
     url: '/projects',
     icon: Folder,
+  },
+  {
+    title: 'Views',
+    url: '/views',
+    icon: LayoutList,
   },
   {
     title: 'Teams',

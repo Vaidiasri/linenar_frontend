@@ -25,7 +25,7 @@ export function KanbanColumn({ id, title, issues }: KanbanColumnProps) {
           {issues.length}
         </span>
       </div>
-      <div className="flex flex-1 flex-col gap-2">
+      <div className="flex flex-1 flex-col gap-2 overflow-y-auto min-h-0">
         <SortableContext items={issues.map((i) => i.id)} strategy={verticalListSortingStrategy}>
           {issues.map((issue) => (
             <KanbanCard key={issue.id} issue={issue} />
