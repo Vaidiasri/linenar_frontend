@@ -9,6 +9,7 @@ import { EditableField } from '@/components/editable-field'
 import { PropertySelect, STATUS_OPTIONS, PRIORITY_OPTIONS } from '@/components/property-select'
 import { CommentThread } from '@/components/comment-thread'
 import { useLinearViewer } from '@/hooks/use-linear-viewer'
+import { ActivityFeed } from '@/components/activity-feed'
 
 // Type definitions for better type safety
 type IssueStatus = 'backlog' | 'todo' | 'in_progress' | 'done' | 'canceled'
@@ -197,6 +198,7 @@ export default function IssueDetail() {
                 </CardHeader>
                 <CardContent className="px-4 pb-3">
                   <CommentThread issueId={id!} currentUserId={currentUser?.id} />
+                  <ActivityFeed issueId={id!} />
                 </CardContent>
               </Card>
             </div>

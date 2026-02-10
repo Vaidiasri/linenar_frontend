@@ -1,5 +1,5 @@
 import { apiSlice } from '../base'
-import type { Issue, CreateIssueData } from '@/api/issue'
+import type { Issue, CreateIssueData, Activity } from '@/api/issue'
 
 export const issuesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -49,6 +49,10 @@ export const issuesApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Issue', 'Dashboard'],
     }),
+    getIssueActivities: builder.query<Activity[], string>({
+      query: (issueId) => `/issues/${issueId}/activities`,
+      providesTags: (_result, _error, issueId) => [{ type: 'Activity', id: issueId }],
+    }),
   }),
 })
 
@@ -58,4 +62,5 @@ export const {
   useCreateIssueMutation,
   useUpdateIssueMutation,
   useDeleteIssueMutation,
+  useGetIssueActivitiesQuery,
 } = issuesApi
