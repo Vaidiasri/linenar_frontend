@@ -13,6 +13,7 @@ export function useCreateIssueForm({ onSuccess }: UseCreateIssueFormProps = {}) 
   const [teamId, setTeamId] = useState<string>('')
   const [assigneeId, setAssigneeId] = useState<string>('')
   const [projectId, setProjectId] = useState<string>('')
+  const [cycleId, setCycleId] = useState<string>('')
 
   const mutation = useCreateIssue()
 
@@ -47,6 +48,7 @@ export function useCreateIssueForm({ onSuccess }: UseCreateIssueFormProps = {}) 
           team_id: teamId,
           assignee_id: assigneeId || undefined,
           project_id: projectId && projectId !== 'no_project' ? projectId : undefined,
+          cycle_id: cycleId && cycleId !== 'no_cycle' ? cycleId : undefined,
         })
         .unwrap()
 
@@ -66,6 +68,7 @@ export function useCreateIssueForm({ onSuccess }: UseCreateIssueFormProps = {}) 
       teamId,
       assigneeId,
       projectId,
+      cycleId,
     },
     setters: {
       setTitle,
@@ -75,6 +78,7 @@ export function useCreateIssueForm({ onSuccess }: UseCreateIssueFormProps = {}) 
       setTeamId: handleTeamChange,
       setAssigneeId,
       setProjectId,
+      setCycleId,
     },
     handleSubmit,
     isPending: mutation.isPending,
