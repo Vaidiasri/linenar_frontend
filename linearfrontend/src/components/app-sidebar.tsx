@@ -11,6 +11,7 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
+import { NotificationsPopover } from '@/components/notifications-popover'
 import { useLinearViewer } from '@/hooks/use-linear-viewer'
 import { useTeams } from '@/hooks/use-teams'
 import { useProjects } from '@/hooks/use-projects'
@@ -88,7 +89,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         <SidebarTrigger className="text-zinc-400 hover:text-zinc-100 transition-colors bg-transparent hover:bg-zinc-800 self-end md:self-start" />
-        {viewer && <NavUser user={userData} />}
+        {viewer && (
+          <div className="flex items-center gap-2">
+            <NotificationsPopover />
+            <NavUser user={userData} />
+          </div>
+        )}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
