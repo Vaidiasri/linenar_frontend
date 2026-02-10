@@ -7,6 +7,8 @@ import ProjectDetail from '@/pages/ProjectDetail'
 import Teams from '@/pages/Teams'
 import Cycles from '@/pages/Cycles'
 import CycleDetail from '@/pages/CycleDetail'
+import Views from '@/pages/Views'
+import ViewDetail from '@/pages/ViewDetail'
 import Members from '@/pages/Members'
 import IssueDetail from '@/pages/IssueDetail'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
@@ -47,6 +49,8 @@ function AppContent() {
         <Route path="/teams" element={<Teams />} />
         <Route path="/cycles" element={<Cycles />} />
         <Route path="/cycles/:id" element={<CycleDetail />} />
+        <Route path="/views" element={<Views />} />
+        <Route path="/views/:id" element={<ViewDetail />} />
         <Route path="/settings/members" element={<Members />} />
       </Route>
     </Routes>
