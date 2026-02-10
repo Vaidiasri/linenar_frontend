@@ -3,7 +3,7 @@ import {
   useCreateTeamMutation,
   useUpdateTeamMutation,
   useDeleteTeamMutation,
-} from '@/store/api/apiSlice'
+} from '@/store/api/endpoints/teams'
 
 import type { UpdateTeamData } from '@/api/team'
 
