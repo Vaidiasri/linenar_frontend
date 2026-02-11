@@ -1,10 +1,13 @@
 import { useParams } from 'react-router-dom'
 import { useGetProjectQuery, useGetIssuesQuery } from '@/store/api/apiSlice'
+import { useIssueFilters } from '@/hooks/use-issue-filters'
 import { PageLayout } from '@/components/page-layout'
 import { Card } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { IssueList } from '@/components/IssueList'
 import { KanbanBoard } from '@/components/KanbanBoard'
+import { SearchBar } from '@/components/search-bar'
+import { FilterPanel } from '@/components/filter-panel'
 import { ListIcon, KanbanIcon } from 'lucide-react'
 
 export default function ProjectDetail() {
@@ -26,6 +29,9 @@ export default function ProjectDetail() {
     }
   )
 
+  const { filters, filteredIssues, updateFilter, clearFilters, hasActiveFilters } =
+    useIssueFilters(issues)
+
   if (isProjectLoading) return <div className="p-8">Loading project details...</div>
   if (projectError) return <div className="p-8 text-red-500">Error loading project</div>
   if (!project) return <div className="p-8">Project not found</div>
@@ -38,6 +44,20 @@ export default function ProjectDetail() {
             {project.description || 'No description provided.'}
           </p>
         </Card>
+
+        <div className="space-y-3">
+          <SearchBar
+            value={filters.search}
+            onChange={(value) => updateFilter('search', value)}
+            placeholder="Search issues..."
+          />
+          <FilterPanel
+            filters={filters}
+            onFilterChange={updateFilter}
+            onClearFilters={clearFilters}
+            hasActiveFilters={hasActiveFilters}
+          />
+        </div>
 
         <Tabs defaultValue="board" className="w-full">
           <div className="flex items-center justify-between mb-4">
@@ -58,7 +78,7 @@ export default function ProjectDetail() {
             {isIssuesLoading ? (
               <div className="py-10 text-center">Loading issues...</div>
             ) : (
-              <IssueList issues={issues || []} />
+              <IssueList issues={filteredIssues} />
             )}
           </TabsContent>
 
@@ -66,7 +86,7 @@ export default function ProjectDetail() {
             {isIssuesLoading ? (
               <div className="py-10 text-center">Loading board...</div>
             ) : (
-              <KanbanBoard issues={issues || []} />
+              <KanbanBoard issues={filteredIssues} />
             )}
           </TabsContent>
         </Tabs>
